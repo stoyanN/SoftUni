@@ -1,0 +1,102 @@
+{{> header}}
+
+{{#if isAuth}}
+<!-- Home -->
+<div class="content">
+    <section class="js">
+        <h2>JavaScript</h2>
+        <div class="articles">
+            {{#if jsArticles}}
+                {{#each jsAllArticles}}
+                <article>
+                    <h3>{{title}}</h3>
+                    <p>{{content}}</p>
+                    <a href="#/details/{{_id}}" class="btn details-btn">Details</a>
+                </article>
+                {{/each}}
+
+            {{else}}
+                <h3 class="no-articles">No articles yet</h3>
+            {{/if}}
+        </div>
+    </section>
+    <section class="CSharp">
+        <h2>C#</h2>
+        <div class="articles">
+            {{#if cSharpArticles}}
+                {{#each cSharpAllArticles}}
+                <article>
+                    <h3>{{title}}</h3>
+                    <p>{{content}}</p>
+                    <a href="#/details/{{_id}}" class="btn details-btn">Details</a>
+                </article>
+                {{/each}}
+
+            {{else}}
+                <h3 class="no-articles">No articles yet</h3>
+            {{/if}}
+        </div>
+    </section>
+    <section class="Java">
+        <h2>Java</h2>
+        <div class="articles">
+            {{#if javaArticles}}
+                {{#each javaAllArticles}}
+                <article>
+                    <h3>{{title}}</h3>
+                    <p>{{content}}</p>
+                    <a href="#/details/{{_id}}" class="btn details-btn">Details</a>
+                </article>
+                {{/each}}
+
+            {{else}}
+                <h3 class="no-articles">No articles yet</h3>
+            {{/if}}
+        </div>
+    </section>
+    <section class="Pyton">
+        <h2>Pyton</h2>
+        <div class="articles">
+            {{#if pytonArticles}}
+                {{#each pytonAllArticles}}
+                <article>
+                    <h3>{{title}}</h3>
+                    <p>{{content}}</p>
+                    <a href="#/details/{{_id}}" class="btn details-btn">Details</a>
+                </article>
+                {{/each}}
+
+            {{else}}
+                <h3 class="no-articles">No articles yet</h3>
+            {{/if}}
+        </div>
+    </section>
+</div>
+{{!-- {{else}}
+<div class="container auth">
+    <form action="#/login" method="post">
+        <fieldset>
+            <legend>Login</legend>
+            <blockquote>Knowledge is like money: to be of value it must circulate, and in circulating it can increase in
+                quantity and, hopefully, in value</blockquote>
+            <p class="field email">
+                <input type="email" id="email" name="username" placeholder="maria@email.com">
+                <label for="email">Email:</label>
+            </p>
+            <p class="field password">
+                <input type="password" id="login-pass" name="password">
+                <label for="login-pass">Password:</label>
+            </p>
+            <p class="field submit">
+                <button class="btn submit" type="submit">Log In</button>
+            </p>
+            <p class="field">
+                <span>If you don't have profile click <a href="#">here</a></span>
+            </p>
+        </fieldset>
+    </form>
+</div> --}}
+{{/if}}
+
+
+{{> footer}}
