@@ -1,4 +1,4 @@
-import { getData, putData, deleteData, postData } from "./requester.js";
+import { getData, putData, deleteData, postData, logOutUser } from "./requester.js";
 import { showUser, saveSession, emailIsValid } from "./additionalHelper.js";
 
 let partials = {
@@ -8,12 +8,14 @@ let partials = {
 
 export async function loadHomePage(ctx) {
     showUser(ctx);
+    let authToken = localStorage.getItem("authtoken");
+
     if (ctx.isAuth) {
-        let articlesRecords = await getData("Kinvey", "appdata", "articles");
+        let articlesRecords = await getData("data", "langArticles", authToken);
         let jsArticles = articlesRecords.filter(a => a.category === "JavaScript").sort((a, b) => a.title.localeCompare(b.title));
         let cSharpArticles = articlesRecords.filter(a => a.category === "C#").sort((a, b) => a.title.localeCompare(b.title));
         let javaArticles = articlesRecords.filter(a => a.category === "Java").sort((a, b) => a.title.localeCompare(b.title));
-        let pytonArticles = articlesRecords.filter(a => a.category === "Pyton").sort((a, b) => a.title.localeCompare(b.title));
+        let pytonArticles = articlesRecords.filter(a => a.category === "Python").sort((a, b) => a.title.localeCompare(b.title));
 
         ctx.jsArticles = jsArticles.length >= 1;
         ctx.jsAllArticles = jsArticles;
@@ -39,16 +41,14 @@ export function registerProceed(ctx) {
     let rePassword = ctx.params["rep-pass"];
 
     if (password === rePassword && emailIsValid(username) && username && password && rePassword) {
-        postData("Basic", "user", "", { username, password })
+        postData("users", "register", { email: username, password })
             .then(userInfo => {
-                saveSession(userInfo);
+                alert("Your registration was completed! Please Log In!");
                 ctx.redirect("#/home");
-
             })
             .catch(err => {
                 alert(err);
             });
-
     } else {
         alert("Something went wrong! Please try again!");
     }
@@ -61,7 +61,7 @@ export function loadLoginPage(ctx) {
 export function loginProceed(ctx) {
     let { username, password } = ctx.params;
 
-    postData("Basic", "user", "login", { username, password })
+    postData("users", "login", { login: username, password })
         .then(userInfo => {
             saveSession(userInfo);
         })
@@ -74,7 +74,9 @@ export function loginProceed(ctx) {
 }
 
 export function logoutProceed(ctx) {
-    postData("Kinvey", "user", "_logout")
+    let authToken = localStorage.getItem("authtoken");
+
+    logOutUser("users", "logout", authToken)
         .then(() => {
             localStorage.clear();
         })
@@ -91,8 +93,8 @@ export function loadCreatePage(ctx) {
 
 export function createProceed(ctx) {
     showUser(ctx);
+    let authToken = localStorage.getItem("authtoken")
     let { title, category, content } = ctx.params;
-    // console.log(ctx.params);
 
     if (title && category && content) {
         let obj = {
@@ -102,7 +104,7 @@ export function createProceed(ctx) {
             creator: ctx.email
         };
 
-        postData("Kinvey", "appdata", "articles", obj)
+        postData("data", "langArticles", obj, authToken)
             .then(() => {
                 ctx.redirect("#/home");
             })
@@ -113,15 +115,16 @@ export function createProceed(ctx) {
 
 export function loadDetailsPage(ctx) {
     let id = ctx.params.id;
+    let authToken = localStorage.getItem("authtoken");
 
-    getData("Kinvey", "appdata", `articles/${id}`)
+    getData("data", `langArticles/${id}`, authToken)
         .then(currentArticle => {
             ctx.title = currentArticle.title;
             ctx.category = currentArticle.category;
             ctx.content = currentArticle.content;
             ctx.creator = currentArticle.creator;
-            ctx._id = currentArticle._id;
-            ctx.isAuthor = localStorage.getItem("userId") === currentArticle._acl.creator;
+            ctx._id = currentArticle.objectId;
+            ctx.isAuthor = localStorage.getItem("userId") === currentArticle.ownerId;
 
             showUser(ctx);
             ctx.loadPartials(partials).partial("./templates/detailsPage.hbs");
@@ -130,8 +133,9 @@ export function loadDetailsPage(ctx) {
 
 export function deleteArticle(ctx) {
     let id = ctx.params.id;
+    let authToken = localStorage.getItem("authtoken");
 
-    deleteData("Kinvey", "appdata", `articles/${id}`)
+    deleteData("data", `langArticles/${id}`, authToken)
         .then(() => ctx.redirect("#/home"))
         .catch(err => alert(err));
 
@@ -139,25 +143,26 @@ export function deleteArticle(ctx) {
 
 export async function editEvent(ctx) {
     showUser(ctx);
-    // console.log(ctx.params.id);
+    let authToken = localStorage.getItem("authtoken");
 
-    let currentArticle = await getData("Kinvey", "appdata", `articles/${ctx.params.id}`);
+    let currentArticle = await getData("data", `langArticles/${ctx.params.id}`, authToken);
     ctx.title = currentArticle.title;
     ctx.category = currentArticle.category;
     ctx.content = currentArticle.content;
     ctx.creator = currentArticle.creator;
-    ctx._id = currentArticle._id;
-    ctx.isAuthor = localStorage.getItem("userId") === currentArticle._acl.creator;
+    ctx._id = currentArticle.objectId;
+    ctx.isAuthor = localStorage.getItem("userId") === currentArticle.ownerId;
 
     await ctx.loadPartials(partials).partial("./templates/editPage.hbs");
 }
 
 export function editEventProceed(ctx) {
     showUser(ctx);
+    let authToken = localStorage.getItem("authtoken");
     let id = ctx.params.id;
     let { title, category, content } = ctx.params;
 
-    getData("Kinvey", "appdata", `articles/${id}`).then(allInfo => {
+    getData("data", `langArticles/${id}`, authToken).then(allInfo => {
         if (title && category && content) {
             allInfo.title = title;
             allInfo.category = category;
@@ -169,18 +174,13 @@ export function editEventProceed(ctx) {
         }
     })
         .then(allInfo => {
-            putData("Kinvey", "appdata", `articles/${id}`, allInfo)
+            putData("data", `langArticles/${id}`, allInfo, authToken)
                 .then(() => {
                     ctx.redirect("#/home");
                 })
                 .catch(err => alert(err));
         })
         .catch(err => alert(err));
-
-
-
-
-
 }
 
 
