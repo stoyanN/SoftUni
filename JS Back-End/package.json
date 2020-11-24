@@ -1,0 +1,21 @@
+{
+  "name": "stoyan.n-js-web-exam",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "@stoyan.n",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cookie-parser": "^1.4.5",
+    "email-validator": "^2.0.4",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.9"
+  }
+}
