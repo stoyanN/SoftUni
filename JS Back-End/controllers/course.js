@@ -98,7 +98,6 @@ module.exports = {
                     res.render('edit', { course, id, errorMessage });
                 }).catch(next);
                 return;
-            // res.redirect(`/edit/${id}`);
         }
 
         models.courseModel.updateOne({ _id: id }, { $set: { ...req.body } }).then(() => {
